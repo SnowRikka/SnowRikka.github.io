@@ -6,7 +6,7 @@
 
 # Email Verification Service API Docs
 
-English | [中文](./API.md)
+English | [中文](./README.md)
 
 > Base URL: `https://api.mailflow.lat`
 >
