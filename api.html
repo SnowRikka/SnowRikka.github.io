@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mailflow - 邮箱验证服务 API 文档</title>
+    <!-- 引入语法高亮样式 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --primary-color: #0366d6;
+            --text-color: #24292e;
+            --bg-color: #ffffff;
+            --border-color: #e1e4e8;
+            --quote-bg: #f6f8fa;
+            --code-bg: #2d2d2d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1, h2, h3, h4 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+
+        h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--border-color); }
+        h2 { font-size: 1.5em; padding-bottom: 0.3em; border-bottom: 1px solid var(--border-color); margin-top: 40px; }
+        h3 { font-size: 1.25em; }
+
+        p { margin-top: 0; margin-bottom: 16px; }
+
+        a { color: var(--primary-color); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        blockquote {
+            margin: 0 0 16px 0;
+            padding: 16px;
+            color: #586069;
+            background-color: var(--quote-bg);
+            border-left: 4px solid #dfe2e5;
+            border-radius: 4px;
+        }
+
+        table {
+            border-spacing: 0;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        table th, table td {
+            padding: 8px 13px;
+            border: 1px solid var(--border-color);
+        }
+
+        table th {
+            font-weight: 600;
+            background-color: var(--quote-bg);
+            text-align: left;
+        }
+
+        table tr:nth-child(2n) {
+            background-color: #fcfcfc;
+        }
+
+        code {
+            padding: 0.2em 0.4em;
+            margin: 0;
+            font-size: 85%;
+            background-color: rgba(27,31,35,0.05);
+            border-radius: 3px;
+            font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+        }
+
+        /* 代码块外层容器，用于定位复制按钮 */
+        .code-wrapper {
+            position: relative;
+            margin-bottom: 16px;
+            border-radius: 6px;
+            background-color: var(--code-bg);
+        }
+
+        .code-wrapper pre {
+            margin: 0 !important;
+            padding: 16px !important;
+            border-radius: 6px;
+            overflow: auto;
+        }
+
+        .code-wrapper pre code {
+            padding: 0;
+            background-color: transparent;
+            font-size: 14px;
+            color: #f8f8f2;
+        }
+
+        /* 复制按钮样式 */
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0; /* 默认隐藏，悬浮显示 */
+        }
+
+        .code-wrapper:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .copy-btn.copied {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+
+        hr {
+            height: 1px;
+            padding: 0;
+            margin: 24px 0;
+            background-color: var(--border-color);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <blockquote>
+        <p>做这个项目是因为一件挺有意思的事。很多独立开发者需要验证用户邮箱，海外的免费服务一般一天只让发 100-200 封，想多用花Money。我就想，有没有那种拿来就能用的接口？于是就有了这个服务。</p>
+        <p>不过免费帮大家发邮件这事不太现实——发多了 IP 很快就被各大邮箱的反垃圾系统拉黑。所以换了个思路：<strong>收邮件</strong>。你不需要让用户填邮箱地址，只需要让用户用任意邮箱往指定地址发一封包含验证码的邮件就行，验证通过后你自然就拿到了用户的邮箱，再存到用户信息里就好了。</p>
+        <p>希望对你有用 📬</p>
+    </blockquote>
+
+    <h1>邮箱验证服务 API 文档</h1>
+
+    <blockquote>
+        <p>Base URL: <code>https://api.mailflow.lat</code></p>
+        <p>所有接口返回 JSON 格式数据。</p>
+    </blockquote>
+
+    <h2>概述</h2>
+    <p>本服务提供邮箱所有权验证能力。核心流程：</p>
+    <ol>
+        <li>调用 <code>/create</code> 创建验证任务，获得收件地址和验证 token</li>
+        <li>引导用户向指定地址发送邮件，邮件正文需包含 token</li>
+        <li>轮询 <code>/result</code> 查询验证状态，直到返回 <code>verified</code></li>
+        <li>验证完成后可调用 <code>/task</code> 删除任务</li>
+    </ol>
+
+    <div class="code-wrapper">
+<pre><code class="language-plaintext">用户发送邮件 → verify+&lt;alias&gt;@mailflow.lat
+                        ↓
+                服务自动完成验证
+                        ↓
+              状态变为 verified → 可通过 /result 查询</code></pre>
+    </div>
+
+    <h2>限流</h2>
+    <table>
+        <thead>
+            <tr><th>层级</th><th>限制</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>日级上限</td><td>1000 req/日/IP</td><td>北京时间 00:00 重置，超限返回 429</td></tr>
+            <tr><td>秒级突发</td><td>10 req/s/IP</td><td>允许短时突发</td></tr>
+        </tbody>
+    </table>
+    <p>超限响应：</p>
+    <div class="code-wrapper">
+<pre><code class="language-http">HTTP 429 Too Many Requests
+Retry-After: &lt;秒数&gt;
+{"error": "rate limit exceeded"}</code></pre>
+    </div>
+
+    <hr>
+
+    <h2>接口列表</h2>
+    <table>
+        <thead>
+            <tr><th>方法</th><th>路径</th><th>鉴权</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>GET</td><td>/health</td><td>无</td><td>健康检查</td></tr>
+            <tr><td>POST</td><td>/create</td><td>无</td><td>创建验证任务</td></tr>
+            <tr><td>POST</td><td>/result</td><td>凭证</td><td>查询验证结果</td></tr>
+            <tr><td>DELETE</td><td>/task</td><td>凭证</td><td>删除任务</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>GET /health</h2>
+    <p>健康检查。</p>
+    <h3>请求</h3>
+    <p>无参数，无请求体。</p>
+    <h3>响应</h3>
+    <table>
+        <thead>
+            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>200</td><td>服务正常</td><td><code>{"status": "ok"}</code></td></tr>
+            <tr><td>503</td><td>服务不可用</td><td><code>{"status": "degraded"}</code></td></tr>
+        </tbody>
+    </table>
+    <h3>示例</h3>
+    <div class="code-wrapper">
+<pre><code class="language-bash">curl https://api.mailflow.lat/health</code></pre>
+    </div>
+    <div class="code-wrapper">
+<pre><code class="language-json">{"status": "ok"}</code></pre>
+    </div>
+
+    <hr>
+
+    <h2>POST /create</h2>
+    <p>创建邮箱验证任务。返回收件地址和验证信息，调用方需引导用户发送包含 token 的邮件。</p>
+    <h3>请求</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>必需</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>callback</td><td>string</td><td>否</td><td>验证成功后的回调通知 URL，必须 HTTPS。留空则不回调</td></tr>
+        </tbody>
+    </table>
+    <h3>响应</h3>
+    <table>
+        <thead>
+            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>200</td><td>创建成功</td><td>见下方</td></tr>
+            <tr><td>400</td><td>请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
+            <tr><td>500</td><td>内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
+        </tbody>
+    </table>
+    <h4>200 响应字段</h4>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>task_id</td><td>string</td><td>任务唯一 ID</td></tr>
+            <tr><td>secret</td><td>string</td><td>任务密钥，用于后续查询和删除</td></tr>
+            <tr><td>signature</td><td>string</td><td>凭证签名，用于身份验证</td></tr>
+            <tr><td>mail</td><td>string</td><td>收件地址，格式 <code>verify+&lt;alias&gt;@mailflow.lat</code></td></tr>
+            <tr><td>subject</td><td>string</td><td>建议邮件主题，格式 <code>VERIFY-&lt;alias&gt;</code></td></tr>
+            <tr><td>token</td><td>string</td><td>验证令牌，<strong>必须出现在邮件正文中</strong></td></tr>
+            <tr><td>expire_at</td><td>integer</td><td>过期时间（Unix 时间戳），默认 24 小时</td></tr>
+        </tbody>
+    </table>
+    <h3>示例</h3>
+    <div class="code-wrapper">
+<pre><code class="language-bash">curl -X POST https://api.mailflow.lat/create \
+  -H "Content-Type: application/json" \
+  -d '{"callback": ""}'</code></pre>
+    </div>
+    <div class="code-wrapper">
+<pre><code class="language-json">{
+  "task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06",
+  "secret": "WkveK_yM2FN0rxOkFQwLdqC93bCBCjV1VHoVOtZOAS0",
+  "signature": "d4568c5b552c5c56868f786d42a125637bda035fcc2aa05179111e7457339deb",
+  "mail": "verify+bjox5y9h@mailflow.lat",
+  "subject": "VERIFY-bjox5y9h",
+  "token": "YENsg_CZjz_23sEmrAko4JofsCDidM6nzS_L1yMfLZ8",
+  "expire_at": 1783624432
+}</code></pre>
+    </div>
+    <h3>使用说明</h3>
+    <ol>
+        <li>将 <code>mail</code> 地址告知用户，作为收件人</li>
+        <li>将 <code>subject</code> 作为邮件主题（或自定义，但建议包含 alias）</li>
+        <li><strong>将 <code>token</code> 放入邮件正文中</strong> — 这是验证的关键</li>
+        <li>保存 <code>task_id</code>、<code>secret</code>、<code>signature</code>，用于后续调用 <code>/result</code> 和 <code>/task</code></li>
+        <li>如需验证完成后自动接收通知，传入 <code>callback</code> URL</li>
+    </ol>
+
+    <hr>
+
+    <h2>POST /result</h2>
+    <p>查询验证结果。需要创建任务时返回的凭证信息。</p>
+    <h3>请求</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>必需</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>task_id</td><td>string</td><td>是</td><td>任务 ID</td></tr>
+            <tr><td>secret</td><td>string</td><td>是</td><td>任务密钥</td></tr>
+            <tr><td>signature</td><td>string</td><td>是</td><td>凭证签名</td></tr>
+        </tbody>
+    </table>
+    <h3>响应</h3>
+    <table>
+        <thead>
+            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>200</td><td>等待验证</td><td><code>{"status": "pending"}</code></td></tr>
+            <tr><td>200</td><td>验证通过</td><td><code>{"status": "verified", "email": "sender@example.com"}</code></td></tr>
+            <tr><td>400</td><td>请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
+            <tr><td>403</td><td>凭证无效</td><td><code>{"error": "forbidden"}</code></td></tr>
+            <tr><td>404</td><td>任务不存在或已过期</td><td><code>{"error": "not found"}</code></td></tr>
+            <tr><td>500</td><td>内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
+        </tbody>
+    </table>
+    <h4>200 响应字段</h4>
+    <p><strong>pending 状态：</strong></p>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>status</td><td>string</td><td><code>"pending"</code> — 等待用户发送验证邮件</td></tr>
+        </tbody>
+    </table>
+    <p><strong>verified 状态：</strong></p>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>status</td><td>string</td><td><code>"verified"</code> — 邮箱验证通过</td></tr>
+            <tr><td>email</td><td>string</td><td>验证通过的发件人邮箱地址</td></tr>
+        </tbody>
+    </table>
+    <h3>示例</h3>
+    <div class="code-wrapper">
+<pre><code class="language-bash">curl -X POST https://api.mailflow.lat/result \
+  -H "Content-Type: application/json" \
+  -d '{
+    "task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06",
+    "secret": "WkveK_yM2FN0rxOkFQwLdqC93bCBCjV1VHoVOtZOAS0",
+    "signature": "d4568c5b552c5c56868f786d42a125637bda035fcc2aa05179111e7457339deb"
+  }'</code></pre>
+    </div>
+    <p>等待验证时：</p>
+    <div class="code-wrapper">
+<pre><code class="language-json">{"status": "pending"}</code></pre>
+    </div>
+    <p>验证通过后：</p>
+    <div class="code-wrapper">
+<pre><code class="language-json">{"status": "verified", "email": "user@example.com"}</code></pre>
+    </div>
+
+    <hr>
+
+    <h2>DELETE /task</h2>
+    <p>删除验证任务。需要创建任务时返回的凭证信息。</p>
+    <h3>请求</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>必需</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>task_id</td><td>string</td><td>是</td><td>任务 ID</td></tr>
+            <tr><td>secret</td><td>string</td><td>是</td><td>任务密钥</td></tr>
+            <tr><td>signature</td><td>string</td><td>是</td><td>凭证签名</td></tr>
+        </tbody>
+    </table>
+    <h3>响应</h3>
+    <table>
+        <thead>
+            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>200</td><td>删除成功</td><td><code>{"ok": true}</code></td></tr>
+            <tr><td>400</td><td>请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
+            <tr><td>403</td><td>凭证无效</td><td><code>{"error": "forbidden"}</code></td></tr>
+            <tr><td>404</td><td>任务不存在或已过期</td><td><code>{"error": "not found"}</code></td></tr>
+            <tr><td>500</td><td>内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
+        </tbody>
+    </table>
+    <h3>示例</h3>
+    <div class="code-wrapper">
+<pre><code class="language-bash">curl -X DELETE https://api.mailflow.lat/task \
+  -H "Content-Type: application/json" \
+  -d '{
+    "task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06",
+    "secret": "WkveK_yM2FN0rxOkFQwLdqC93bCBCjV1VHoVOtZOAS0",
+    "signature": "d4568c5b552c5c56868f786d42a125637bda035fcc2aa05179111e7457339deb"
+  }'</code></pre>
+    </div>
+    <div class="code-wrapper">
+<pre><code class="language-json">{"ok": true}</code></pre>
+    </div>
+
+    <hr>
+
+    <h2>回调通知</h2>
+    <p>如果在创建任务时提供了 <code>callback</code> URL，验证通过后服务会向该 URL 发送 POST 请求：</p>
+    <h3>回调请求</h3>
+    <div class="code-wrapper">
+<pre><code class="language-http">POST &lt;callback_url&gt;
+Content-Type: application/json</code></pre>
+    </div>
+    <div class="code-wrapper">
+<pre><code class="language-json">{
+  "task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06",
+  "status": "verified",
+  "email": "user@example.com",
+  "verified_at": 1783624500
+}</code></pre>
+    </div>
+    <h3>回调字段</h3>
+    <table>
+        <thead>
+            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>task_id</td><td>string</td><td>任务 ID</td></tr>
+            <tr><td>status</td><td>string</td><td><code>"verified"</code></td></tr>
+            <tr><td>email</td><td>string</td><td>验证通过的发件人邮箱</td></tr>
+            <tr><td>verified_at</td><td>integer</td><td>验证时间（Unix 时间戳）</td></tr>
+        </tbody>
+    </table>
+    <h3>回调规则</h3>
+    <ul>
+        <li><strong>仅 HTTPS</strong> — HTTP 地址会被拒绝</li>
+        <li><strong>请求超时 5 秒</strong> — 服务发送 POST 后，如果 5 秒内未收到响应则放弃本次回调</li>
+        <li><strong>回调失败不影响验证结果</strong> — 验证状态已变为 verified，回调仅是通知</li>
+        <li><strong>不重试</strong> — 回调失败后不会再次发送</li>
+        <li><strong>URL 最大长度 2048 字符</strong></li>
+    </ul>
+
+    <hr>
+
+    <h2>错误码汇总</h2>
+    <table>
+        <thead>
+            <tr><th>HTTP 状态码</th><th>error 值</th><th>触发条件</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>400</td><td><code>bad payload</code></td><td>请求体 JSON 格式错误或缺少必需字段</td></tr>
+            <tr><td>403</td><td><code>forbidden</code></td><td>凭证验证失败（task_id/secret/signature 不匹配）</td></tr>
+            <tr><td>404</td><td><code>not found</code></td><td>任务不存在或已过期</td></tr>
+            <tr><td>429</td><td><code>rate limit exceeded</code></td><td>触发限流（日级或秒级）</td></tr>
+            <tr><td>500</td><td><code>internal error</code></td><td>服务内部错误</td></tr>
+            <tr><td>503</td><td><code>degraded</code></td><td>服务不可用（仅 /health）</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <h2>完整流程示例</h2>
+    <div class="code-wrapper">
+<pre><code class="language-bash"># 1. 创建验证任务
+RESPONSE=$(curl -s -X POST https://api.mailflow.lat/create \
+  -H "Content-Type: application/json" \
+  -d '{"callback": ""}')
+
+# 解析返回值
+TASK_ID=$(echo $RESPONSE | jq -r '.task_id')
+SECRET=$(echo $RESPONSE | jq -r '.secret')
+SIGNATURE=$(echo $RESPONSE | jq -r '.signature')
+MAIL=$(echo $RESPONSE | jq -r '.mail')
+TOKEN=$(echo $RESPONSE | jq -r '.token')
+
+echo "请发送邮件到: $MAIL"
+echo "邮件正文需包含: $TOKEN"
+
+# 2. 轮询验证结果（用户发送邮件后）
+while true; do
+  RESULT=$(curl -s -X POST https://api.mailflow.lat/result \
+    -H "Content-Type: application/json" \
+    -d "{\"task_id\":\"$TASK_ID\",\"secret\":\"$SECRET\",\"signature\":\"$SIGNATURE\"}")
+  
+  STATUS=$(echo $RESULT | jq -r '.status')
+  
+  if [ "$STATUS" = "verified" ]; then
+    echo "验证通过! 发件人: $(echo $RESULT | jq -r '.email')"
+    break
+  elif [ "$STATUS" = "pending" ]; then
+    echo "等待验证..."
+    sleep 5
+  else
+    echo "异常: $RESULT"
+    break
+  fi
+done
+
+# 3. 删除任务
+curl -s -X DELETE https://api.mailflow.lat/task \
+  -H "Content-Type: application/json" \
+  -d "{\"task_id\":\"$TASK_ID\",\"secret\":\"$SECRET\",\"signature\":\"$SIGNATURE\"}"</code></pre>
+    </div>
+
+    <hr>
+
+    <h2>注意事项</h2>
+    <ul>
+        <li><strong>token 必须出现在邮件正文中</strong> — 这是验证的唯一依据，主题中包含 token 无效</li>
+        <li><strong>任务默认 24 小时过期</strong> — 过期后查询返回 404</li>
+        <li><strong>同一任务只能验证一次</strong> — 即使收到多封邮件，状态也只会从 pending 变为 verified 一次</li>
+        <li><strong>验证通过后可多次查询</strong> — 在任务过期或被删除前，/result 可反复调用，始终返回 verified 状态</li>
+        <li><strong>凭证三件套（task_id + secret + signature）必须完整保存</strong> — 缺少任何一个都无法查询或删除</li>
+        <li><strong>邮件主题建议使用返回的 subject 字段</strong> — 虽然不强制，但有助于用户识别</li>
+        <li><strong>callback URL 必须使用 HTTPS</strong> — HTTP 地址会被拒绝</li>
+        <li><strong>未设置回调时，建议在用户发送邮件后 3-10 秒开始查询</strong> — 邮件投递链路通常需要数秒，过早查询只会得到 pending</li>
+    </ul>
+
+    <hr>
+
+    <h2>示例代码</h2>
+    
+    <h3>curl</h3>
+    <div class="code-wrapper">
+<pre><code class="language-bash"># 创建任务
+curl -s -X POST https://api.mailflow.lat/create \
+  -H "Content-Type: application/json" \
+  -d '{"callback": ""}'
+
+# 查询结果
+curl -s -X POST https://api.mailflow.lat/result \
+  -H "Content-Type: application/json" \
+  -d '{"task_id":"&lt;task_id&gt;","secret":"&lt;secret&gt;","signature":"&lt;signature&gt;"}'
+
+# 删除任务
+curl -s -X DELETE https://api.mailflow.lat/task \
+  -H "Content-Type: application/json" \
+  -d '{"task_id":"&lt;task_id&gt;","secret":"&lt;secret&gt;","signature":"&lt;signature&gt;"}'</code></pre>
+    </div>
+
+    <h3>Python</h3>
+    <div class="code-wrapper">
+<pre><code class="language-python">import requests
+
+BASE = "https://api.mailflow.lat"
+
+# 创建验证任务
+resp = requests.post(f"{BASE}/create", json={"callback": ""})
+task = resp.json()
+print(f"收件地址: {task['mail']}")
+print(f"邮件正文需包含: {task['token']}")
+
+# 查询验证结果
+resp = requests.post(f"{BASE}/result", json={
+    "task_id": task["task_id"],
+    "secret": task["secret"],
+    "signature": task["signature"],
+})
+result = resp.json()
+print(f"状态: {result['status']}")
+# verified 时: result["email"] 为发件人地址
+
+# 删除任务
+requests.delete(f"{BASE}/task", json={
+    "task_id": task["task_id"],
+    "secret": task["secret"],
+    "signature": task["signature"],
+})</code></pre>
+    </div>
+
+    <h3>Node.js</h3>
+    <div class="code-wrapper">
+<pre><code class="language-javascript">const BASE = "https://api.mailflow.lat";
+
+// 创建验证任务
+const createResp = await fetch(`${BASE}/create`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ callback: "" }),
+});
+const task = await createResp.json();
+console.log(`收件地址: ${task.mail}`);
+console.log(`邮件正文需包含: ${task.token}`);
+
+// 查询验证结果
+const resultResp = await fetch(`${BASE}/result`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    task_id: task.task_id,
+    secret: task.secret,
+    signature: task.signature,
+  }),
+});
+const result = await resultResp.json();
+console.log(`状态: ${result.status}`);
+// verified 时: result.email 为发件人地址
+
+// 删除任务
+await fetch(`${BASE}/task`, {
+  method: "DELETE",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    task_id: task.task_id,
+    secret: task.secret,
+    signature: task.signature,
+  }),
+});</code></pre>
+    </div>
+</div>
+
+<!-- 引入语法高亮脚本 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+
+<!-- 一键复制功能实现 -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const codeWrappers = document.querySelectorAll('.code-wrapper');
+        
+        codeWrappers.forEach(wrapper => {
+            // 创建复制按钮
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerText = '复制';
+            
+            // 绑定点击事件
+            copyBtn.addEventListener('click', () => {
+                const codeElement = wrapper.querySelector('code');
+                const textToCopy = codeElement.innerText;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // 复制成功，改变按钮状态
+                    copyBtn.innerText = '已复制!';
+                    copyBtn.classList.add('copied');
+                    
+                    // 2秒后恢复原状
+                    setTimeout(() => {
+                        copyBtn.innerText = '复制';
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                }).catch(err => {
+                    console.error('复制失败: ', err);
+                    copyBtn.innerText = '失败';
+                });
+            });
+            
+            // 将按钮添加到代码块容器中
+            wrapper.appendChild(copyBtn);
+        });
+    });
+</script>
+</body>
+</html>
