@@ -6,6 +6,8 @@
 
 # 邮箱验证服务 API 文档
 
+[English](./API.en.md) | 中文
+
 > Base URL: `https://api.mailflow.lat`
 >
 > 所有接口返回 JSON 格式数据。
