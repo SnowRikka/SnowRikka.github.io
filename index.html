@@ -145,31 +145,57 @@
             background-color: var(--border-color);
             border: 0;
         }
+
+        /* 语言切换按钮 */
+        .lang-toggle {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 9999;
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #586069;
+            background-color: #f6f8fa;
+            border: 1px solid #d1d5da;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            line-height: 1.4;
+        }
+
+        .lang-toggle:hover {
+            background-color: #e1e4e8;
+            color: #24292e;
+        }
     </style>
 </head>
 <body>
 
+<button class="lang-toggle" id="langToggle" data-zh="EN" data-en="中文">EN</button>
+
 <div class="container">
     <blockquote>
-        <p>做这个项目是因为一件挺有意思的事。很多独立开发者需要验证用户邮箱，海外的免费服务一般一天只让发 100-200 封，想多用花Money。我就想，有没有那种拿来就能用的接口？于是就有了这个服务。</p>
-        <p>不过免费帮大家发邮件这事不太现实——发多了 IP 很快就被各大邮箱的反垃圾系统拉黑。所以换了个思路：<strong>收邮件</strong>。你不需要让用户填邮箱地址，只需要让用户用任意邮箱往指定地址发一封包含验证码的邮件就行，验证通过后你自然就拿到了用户的邮箱，再存到用户信息里就好了。</p>
-        <p>希望对你有用 📬</p>
+        <p data-zh="做这个项目是因为一件挺有意思的事。很多独立开发者需要验证用户邮箱，海外的免费服务一般一天只让发 100-200 封，想多用花Money。我就想，有没有那种拿来就能用的接口？于是就有了这个服务。" data-en="I built this because of something interesting. Many indie developers need to verify user emails, but free overseas services typically limit you to 100-200 sends per day — and require registration plus DNS records to go beyond that. I wondered: isn't there an API you can just use, right away? So I built this service.">做这个项目是因为一件挺有意思的事。很多独立开发者需要验证用户邮箱，海外的免费服务一般一天只让发 100-200 封，想多用花Money。我就想，有没有那种拿来就能用的接口？于是就有了这个服务。</p>
+        <p data-zh="不过免费帮大家发邮件这事不太现实——发多了 IP 很快就被各大邮箱的反垃圾系统拉黑。所以换了个思路：收邮件。你不需要让用户填邮箱地址，只需要让用户用任意邮箱往指定地址发一封包含验证码的邮件就行，验证通过后你自然就拿到了用户的邮箱，再存到用户信息里就好了。" data-en="Free email sending at scale isn't realistic — the sender IP gets blacklisted by major spam filters fast. So I flipped the approach: receive mail instead. You don't need users to type in their email address — just have them send a token-bearing email from any mailbox to a given address. Once verified, you've got their email, and you can store it in their profile.">不过免费帮大家发邮件这事不太现实——发多了 IP 很快就被各大邮箱的反垃圾系统拉黑。所以换了个思路：<strong>收邮件</strong>。你不需要让用户填邮箱地址，只需要让用户用任意邮箱往指定地址发一封包含验证码的邮件就行，验证通过后你自然就拿到了用户的邮箱，再存到用户信息里就好了。</p>
+        <p data-zh="希望对你有用 📬" data-en="Hope you find it useful 📬">希望对你有用 📬</p>
     </blockquote>
 
-    <h1>邮箱验证服务 API 文档</h1>
+    <h1 data-zh="邮箱验证服务 API 文档" data-en="Email Verification Service API Docs">邮箱验证服务 API 文档</h1>
 
     <blockquote>
         <p>Base URL: <code>https://api.mailflow.lat</code></p>
-        <p>所有接口返回 JSON 格式数据。</p>
+        <p data-zh="所有接口返回 JSON 格式数据。" data-en="All endpoints return JSON data.">所有接口返回 JSON 格式数据。</p>
     </blockquote>
 
-    <h2>概述</h2>
-    <p>本服务提供邮箱所有权验证能力。核心流程：</p>
+    <h2 data-zh="概述" data-en="Overview">概述</h2>
+    <p data-zh="本服务提供邮箱所有权验证能力。核心流程：" data-en="This service provides email ownership verification. Core flow:">本服务提供邮箱所有权验证能力。核心流程：</p>
     <ol>
-        <li>调用 <code>/create</code> 创建验证任务，获得收件地址和验证 token</li>
-        <li>引导用户向指定地址发送邮件，邮件正文需包含 token</li>
-        <li>轮询 <code>/result</code> 查询验证状态，直到返回 <code>verified</code></li>
-        <li>验证完成后可调用 <code>/task</code> 删除任务</li>
+        <li data-zh='调用 <code>/create</code> 创建验证任务，获得收件地址和验证 token' data-en='Call <code>/create</code> to create a verification task and get the recipient address and token'>调用 <code>/create</code> 创建验证任务，获得收件地址和验证 token</li>
+        <li data-zh='引导用户向指定地址发送邮件，邮件正文需包含 token' data-en='Guide the user to send an email to the specified address with the token in the body'>引导用户向指定地址发送邮件，邮件正文需包含 token</li>
+        <li data-zh='轮询 <code>/result</code> 查询验证状态，直到返回 <code>verified</code>' data-en='Poll <code>/result</code> to check verification status until it returns <code>verified</code>'>轮询 <code>/result</code> 查询验证状态，直到返回 <code>verified</code></li>
+        <li data-zh='验证完成后可调用 <code>/task</code> 删除任务' data-en='After verification, call <code>/task</code> to delete the task'>验证完成后可调用 <code>/task</code> 删除任务</li>
     </ol>
 
     <div class="code-wrapper">
@@ -180,17 +206,17 @@
               状态变为 verified → 可通过 /result 查询</code></pre>
     </div>
 
-    <h2>限流</h2>
+    <h2 data-zh="限流" data-en="Rate Limits">限流</h2>
     <table>
         <thead>
-            <tr><th>层级</th><th>限制</th><th>说明</th></tr>
+            <tr><th data-zh="层级" data-en="Tier">层级</th><th data-zh="限制" data-en="Limit">限制</th><th data-zh="说明" data-en="Notes">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>日级上限</td><td>1000 req/日/IP</td><td>北京时间 00:00 重置，超限返回 429</td></tr>
-            <tr><td>秒级突发</td><td>10 req/s/IP</td><td>允许短时突发</td></tr>
+            <tr><td data-zh="日级上限" data-en="Daily limit">日级上限</td><td>1000 req/日/IP</td><td data-zh="北京时间 00:00 重置，超限返回 429" data-en="Resets at 00:00 Beijing time; returns 429 when exceeded">北京时间 00:00 重置，超限返回 429</td></tr>
+            <tr><td data-zh="秒级突发" data-en="Burst limit">秒级突发</td><td>10 req/s/IP</td><td data-zh="允许短时突发" data-en="Short bursts allowed">允许短时突发</td></tr>
         </tbody>
     </table>
-    <p>超限响应：</p>
+    <p data-zh="超限响应：" data-en="Rate-limited response:">超限响应：</p>
     <div class="code-wrapper">
 <pre><code class="language-http">HTTP 429 Too Many Requests
 Retry-After: &lt;秒数&gt;
@@ -199,36 +225,36 @@ Retry-After: &lt;秒数&gt;
 
     <hr>
 
-    <h2>接口列表</h2>
+    <h2 data-zh="接口列表" data-en="Endpoints">接口列表</h2>
     <table>
         <thead>
-            <tr><th>方法</th><th>路径</th><th>鉴权</th><th>说明</th></tr>
+            <tr><th data-zh="方法" data-en="Method">方法</th><th data-zh="路径" data-en="Path">路径</th><th data-zh="鉴权" data-en="Auth">鉴权</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>GET</td><td>/health</td><td>无</td><td>健康检查</td></tr>
-            <tr><td>POST</td><td>/create</td><td>无</td><td>创建验证任务</td></tr>
-            <tr><td>POST</td><td>/result</td><td>凭证</td><td>查询验证结果</td></tr>
-            <tr><td>DELETE</td><td>/task</td><td>凭证</td><td>删除任务</td></tr>
+            <tr><td>GET</td><td>/health</td><td data-zh="无" data-en="None">无</td><td data-zh="健康检查" data-en="Health check">健康检查</td></tr>
+            <tr><td>POST</td><td>/create</td><td data-zh="无" data-en="None">无</td><td data-zh="创建验证任务" data-en="Create verification task">创建验证任务</td></tr>
+            <tr><td>POST</td><td>/result</td><td data-zh="凭证" data-en="Credentials">凭证</td><td data-zh="查询验证结果" data-en="Query verification result">查询验证结果</td></tr>
+            <tr><td>DELETE</td><td>/task</td><td data-zh="凭证" data-en="Credentials">凭证</td><td data-zh="删除任务" data-en="Delete task">删除任务</td></tr>
         </tbody>
     </table>
 
     <hr>
 
     <h2>GET /health</h2>
-    <p>健康检查。</p>
-    <h3>请求</h3>
-    <p>无参数，无请求体。</p>
-    <h3>响应</h3>
+    <p data-zh="健康检查。" data-en="Health check.">健康检查。</p>
+    <h3 data-zh="请求" data-en="Request">请求</h3>
+    <p data-zh="无参数，无请求体。" data-en="No parameters, no request body.">无参数，无请求体。</p>
+    <h3 data-zh="响应" data-en="Response">响应</h3>
     <table>
         <thead>
-            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+            <tr><th data-zh="状态码" data-en="Status">状态码</th><th data-zh="含义" data-en="Meaning">含义</th><th data-zh="响应体" data-en="Body">响应体</th></tr>
         </thead>
         <tbody>
-            <tr><td>200</td><td>服务正常</td><td><code>{"status": "ok"}</code></td></tr>
-            <tr><td>503</td><td>服务不可用</td><td><code>{"status": "degraded"}</code></td></tr>
+            <tr><td>200</td><td data-zh="服务正常" data-en="Service OK">服务正常</td><td><code>{"status": "ok"}</code></td></tr>
+            <tr><td>503</td><td data-zh="服务不可用" data-en="Service unavailable">服务不可用</td><td><code>{"status": "degraded"}</code></td></tr>
         </tbody>
     </table>
-    <h3>示例</h3>
+    <h3 data-zh="示例" data-en="Example">示例</h3>
     <div class="code-wrapper">
 <pre><code class="language-bash">curl https://api.mailflow.lat/health</code></pre>
     </div>
@@ -239,43 +265,43 @@ Retry-After: &lt;秒数&gt;
     <hr>
 
     <h2>POST /create</h2>
-    <p>创建邮箱验证任务。返回收件地址和验证信息，调用方需引导用户发送包含 token 的邮件。</p>
-    <h3>请求</h3>
+    <p data-zh="创建邮箱验证任务。返回收件地址和验证信息，调用方需引导用户发送包含 token 的邮件。" data-en="Create an email verification task. Returns the recipient address and verification info. The caller should guide the user to send an email containing the token.">创建邮箱验证任务。返回收件地址和验证信息，调用方需引导用户发送包含 token 的邮件。</p>
+    <h3 data-zh="请求" data-en="Request">请求</h3>
     <table>
         <thead>
-            <tr><th>字段</th><th>类型</th><th>必需</th><th>说明</th></tr>
+            <tr><th data-zh="字段" data-en="Field">字段</th><th data-zh="类型" data-en="Type">类型</th><th data-zh="必需" data-en="Required">必需</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>callback</td><td>string</td><td>否</td><td>验证成功后的回调通知 URL，必须 HTTPS。留空则不回调</td></tr>
+            <tr><td>callback</td><td>string</td><td data-zh="否" data-en="No">否</td><td data-zh="验证成功后的回调通知 URL，必须 HTTPS。留空则不回调" data-en="Callback notification URL on successful verification; must be HTTPS. Leave empty to skip callback">验证成功后的回调通知 URL，必须 HTTPS。留空则不回调</td></tr>
         </tbody>
     </table>
-    <h3>响应</h3>
+    <h3 data-zh="响应" data-en="Response">响应</h3>
     <table>
         <thead>
-            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+            <tr><th data-zh="状态码" data-en="Status">状态码</th><th data-zh="含义" data-en="Meaning">含义</th><th data-zh="响应体" data-en="Body">响应体</th></tr>
         </thead>
         <tbody>
-            <tr><td>200</td><td>创建成功</td><td>见下方</td></tr>
-            <tr><td>400</td><td>请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
-            <tr><td>500</td><td>内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
+            <tr><td>200</td><td data-zh="创建成功" data-en="Created">创建成功</td><td data-zh="见下方" data-en="See below">见下方</td></tr>
+            <tr><td>400</td><td data-zh="请求体格式错误" data-en="Bad request body">请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
+            <tr><td>500</td><td data-zh="内部错误" data-en="Internal error">内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
         </tbody>
     </table>
-    <h4>200 响应字段</h4>
+    <h4 data-zh="200 响应字段" data-en="200 Response Fields">200 响应字段</h4>
     <table>
         <thead>
-            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><th data-zh="字段" data-en="Field">字段</th><th data-zh="类型" data-en="Type">类型</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>task_id</td><td>string</td><td>任务唯一 ID</td></tr>
-            <tr><td>secret</td><td>string</td><td>任务密钥，用于后续查询和删除</td></tr>
-            <tr><td>signature</td><td>string</td><td>凭证签名，用于身份验证</td></tr>
-            <tr><td>mail</td><td>string</td><td>收件地址，格式 <code>verify+&lt;alias&gt;@mailflow.lat</code></td></tr>
-            <tr><td>subject</td><td>string</td><td>建议邮件主题，格式 <code>VERIFY-&lt;alias&gt;</code></td></tr>
-            <tr><td>token</td><td>string</td><td>验证令牌，<strong>必须出现在邮件正文中</strong></td></tr>
-            <tr><td>expire_at</td><td>integer</td><td>过期时间（Unix 时间戳），默认 24 小时</td></tr>
+            <tr><td>task_id</td><td>string</td><td data-zh="任务唯一 ID" data-en="Unique task ID">任务唯一 ID</td></tr>
+            <tr><td>secret</td><td>string</td><td data-zh="任务密钥，用于后续查询和删除" data-en="Task secret, used for subsequent queries and deletion">任务密钥，用于后续查询和删除</td></tr>
+            <tr><td>signature</td><td>string</td><td data-zh="凭证签名，用于身份验证" data-en="Credential signature for authentication">凭证签名，用于身份验证</td></tr>
+            <tr><td>mail</td><td>string</td><td data-zh='收件地址，格式 <code>verify+&lt;alias&gt;@mailflow.lat</code>' data-en='Recipient address, format <code>verify+&lt;alias&gt;@mailflow.lat</code>'>收件地址，格式 <code>verify+&lt;alias&gt;@mailflow.lat</code></td></tr>
+            <tr><td>subject</td><td>string</td><td data-zh='建议邮件主题，格式 <code>VERIFY-&lt;alias&gt;</code>' data-en='Suggested email subject, format <code>VERIFY-&lt;alias&gt;</code>'>建议邮件主题，格式 <code>VERIFY-&lt;alias&gt;</code></td></tr>
+            <tr><td>token</td><td>string</td><td data-zh="验证令牌，必须出现在邮件正文中" data-en="Verification token; must appear in the email body">验证令牌，<strong>必须出现在邮件正文中</strong></td></tr>
+            <tr><td>expire_at</td><td>integer</td><td data-zh="过期时间（Unix 时间戳），默认 24 小时" data-en="Expiration time (Unix timestamp), default 24 hours">过期时间（Unix 时间戳），默认 24 小时</td></tr>
         </tbody>
     </table>
-    <h3>示例</h3>
+    <h3 data-zh="示例" data-en="Example">示例</h3>
     <div class="code-wrapper">
 <pre><code class="language-bash">curl -X POST https://api.mailflow.lat/create \
   -H "Content-Type: application/json" \
@@ -292,65 +318,65 @@ Retry-After: &lt;秒数&gt;
   "expire_at": 1783624432
 }</code></pre>
     </div>
-    <h3>使用说明</h3>
+    <h3 data-zh="使用说明" data-en="Usage Notes">使用说明</h3>
     <ol>
-        <li>将 <code>mail</code> 地址告知用户，作为收件人</li>
-        <li>将 <code>subject</code> 作为邮件主题（或自定义，但建议包含 alias）</li>
-        <li><strong>将 <code>token</code> 放入邮件正文中</strong> — 这是验证的关键</li>
-        <li>保存 <code>task_id</code>、<code>secret</code>、<code>signature</code>，用于后续调用 <code>/result</code> 和 <code>/task</code></li>
-        <li>如需验证完成后自动接收通知，传入 <code>callback</code> URL</li>
+        <li data-zh='将 <code>mail</code> 地址告知用户，作为收件人' data-en='Provide the <code>mail</code> address to the user as the recipient'>将 <code>mail</code> 地址告知用户，作为收件人</li>
+        <li data-zh='将 <code>subject</code> 作为邮件主题（或自定义，但建议包含 alias）' data-en='Use <code>subject</code> as the email subject (or customize, but include the alias)'>将 <code>subject</code> 作为邮件主题（或自定义，但建议包含 alias）</li>
+        <li data-zh='<strong>将 <code>token</code> 放入邮件正文中</strong> — 这是验证的关键' data-en='<strong>Put the <code>token</code> in the email body</strong> — this is the key to verification'><strong>将 <code>token</code> 放入邮件正文中</strong> — 这是验证的关键</li>
+        <li data-zh='保存 <code>task_id</code>、<code>secret</code>、<code>signature</code>，用于后续调用 <code>/result</code> 和 <code>/task</code>' data-en='Save <code>task_id</code>, <code>secret</code>, <code>signature</code> for subsequent <code>/result</code> and <code>/task</code> calls'>保存 <code>task_id</code>、<code>secret</code>、<code>signature</code>，用于后续调用 <code>/result</code> 和 <code>/task</code></li>
+        <li data-zh='如需验证完成后自动接收通知，传入 <code>callback</code> URL' data-en='Pass a <code>callback</code> URL to receive automatic notification after verification'>如需验证完成后自动接收通知，传入 <code>callback</code> URL</li>
     </ol>
 
     <hr>
 
     <h2>POST /result</h2>
-    <p>查询验证结果。需要创建任务时返回的凭证信息。</p>
-    <h3>请求</h3>
+    <p data-zh="查询验证结果。需要创建任务时返回的凭证信息。" data-en="Query verification result. Requires the credentials returned at task creation.">查询验证结果。需要创建任务时返回的凭证信息。</p>
+    <h3 data-zh="请求" data-en="Request">请求</h3>
     <table>
         <thead>
-            <tr><th>字段</th><th>类型</th><th>必需</th><th>说明</th></tr>
+            <tr><th data-zh="字段" data-en="Field">字段</th><th data-zh="类型" data-en="Type">类型</th><th data-zh="必需" data-en="Required">必需</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>task_id</td><td>string</td><td>是</td><td>任务 ID</td></tr>
-            <tr><td>secret</td><td>string</td><td>是</td><td>任务密钥</td></tr>
-            <tr><td>signature</td><td>string</td><td>是</td><td>凭证签名</td></tr>
+            <tr><td>task_id</td><td>string</td><td data-zh="是" data-en="Yes">是</td><td data-zh="任务 ID" data-en="Task ID">任务 ID</td></tr>
+            <tr><td>secret</td><td>string</td><td data-zh="是" data-en="Yes">是</td><td data-zh="任务密钥" data-en="Task secret">任务密钥</td></tr>
+            <tr><td>signature</td><td>string</td><td data-zh="是" data-en="Yes">是</td><td data-zh="凭证签名" data-en="Credential signature">凭证签名</td></tr>
         </tbody>
     </table>
-    <h3>响应</h3>
+    <h3 data-zh="响应" data-en="Response">响应</h3>
     <table>
         <thead>
-            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+            <tr><th data-zh="状态码" data-en="Status">状态码</th><th data-zh="含义" data-en="Meaning">含义</th><th data-zh="响应体" data-en="Body">响应体</th></tr>
         </thead>
         <tbody>
-            <tr><td>200</td><td>等待验证</td><td><code>{"status": "pending"}</code></td></tr>
-            <tr><td>200</td><td>验证通过</td><td><code>{"status": "verified", "email": "sender@example.com"}</code></td></tr>
-            <tr><td>400</td><td>请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
-            <tr><td>403</td><td>凭证无效</td><td><code>{"error": "forbidden"}</code></td></tr>
-            <tr><td>404</td><td>任务不存在或已过期</td><td><code>{"error": "not found"}</code></td></tr>
-            <tr><td>500</td><td>内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
+            <tr><td>200</td><td data-zh="等待验证" data-en="Awaiting verification">等待验证</td><td><code>{"status": "pending"}</code></td></tr>
+            <tr><td>200</td><td data-zh="验证通过" data-en="Verified">验证通过</td><td><code>{"status": "verified", "email": "sender@example.com"}</code></td></tr>
+            <tr><td>400</td><td data-zh="请求体格式错误" data-en="Bad request body">请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
+            <tr><td>403</td><td data-zh="凭证无效" data-en="Invalid credentials">凭证无效</td><td><code>{"error": "forbidden"}</code></td></tr>
+            <tr><td>404</td><td data-zh="任务不存在或已过期" data-en="Task not found or expired">任务不存在或已过期</td><td><code>{"error": "not found"}</code></td></tr>
+            <tr><td>500</td><td data-zh="内部错误" data-en="Internal error">内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
         </tbody>
     </table>
-    <h4>200 响应字段</h4>
-    <p><strong>pending 状态：</strong></p>
+    <h4 data-zh="200 响应字段" data-en="200 Response Fields">200 响应字段</h4>
+    <p data-zh="<strong>pending 状态：</strong>" data-en="<strong>pending state:</strong>"><strong>pending 状态：</strong></p>
     <table>
         <thead>
-            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><th data-zh="字段" data-en="Field">字段</th><th data-zh="类型" data-en="Type">类型</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>status</td><td>string</td><td><code>"pending"</code> — 等待用户发送验证邮件</td></tr>
+            <tr><td>status</td><td>string</td><td data-zh='<code>"pending"</code> — 等待用户发送验证邮件' data-en='<code>"pending"</code> — awaiting user verification email'><code>"pending"</code> — 等待用户发送验证邮件</td></tr>
         </tbody>
     </table>
-    <p><strong>verified 状态：</strong></p>
+    <p data-zh="<strong>verified 状态：</strong>" data-en="<strong>verified state:</strong>"><strong>verified 状态：</strong></p>
     <table>
         <thead>
-            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><th data-zh="字段" data-en="Field">字段</th><th data-zh="类型" data-en="Type">类型</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>status</td><td>string</td><td><code>"verified"</code> — 邮箱验证通过</td></tr>
-            <tr><td>email</td><td>string</td><td>验证通过的发件人邮箱地址</td></tr>
+            <tr><td>status</td><td>string</td><td data-zh='<code>"verified"</code> — 邮箱验证通过' data-en='<code>"verified"</code> — email verification passed'><code>"verified"</code> — 邮箱验证通过</td></tr>
+            <tr><td>email</td><td>string</td><td data-zh="验证通过的发件人邮箱地址" data-en="Verified sender email address">验证通过的发件人邮箱地址</td></tr>
         </tbody>
     </table>
-    <h3>示例</h3>
+    <h3 data-zh="示例" data-en="Example">示例</h3>
     <div class="code-wrapper">
 <pre><code class="language-bash">curl -X POST https://api.mailflow.lat/result \
   -H "Content-Type: application/json" \
@@ -360,11 +386,11 @@ Retry-After: &lt;秒数&gt;
     "signature": "d4568c5b552c5c56868f786d42a125637bda035fcc2aa05179111e7457339deb"
   }'</code></pre>
     </div>
-    <p>等待验证时：</p>
+    <p data-zh="等待验证时：" data-en="While awaiting verification:">等待验证时：</p>
     <div class="code-wrapper">
 <pre><code class="language-json">{"status": "pending"}</code></pre>
     </div>
-    <p>验证通过后：</p>
+    <p data-zh="验证通过后：" data-en="After verification:">验证通过后：</p>
     <div class="code-wrapper">
 <pre><code class="language-json">{"status": "verified", "email": "user@example.com"}</code></pre>
     </div>
@@ -372,32 +398,32 @@ Retry-After: &lt;秒数&gt;
     <hr>
 
     <h2>DELETE /task</h2>
-    <p>删除验证任务。需要创建任务时返回的凭证信息。</p>
-    <h3>请求</h3>
+    <p data-zh="删除验证任务。需要创建任务时返回的凭证信息。" data-en="Delete a verification task. Requires the credentials returned at task creation.">删除验证任务。需要创建任务时返回的凭证信息。</p>
+    <h3 data-zh="请求" data-en="Request">请求</h3>
     <table>
         <thead>
-            <tr><th>字段</th><th>类型</th><th>必需</th><th>说明</th></tr>
+            <tr><th data-zh="字段" data-en="Field">字段</th><th data-zh="类型" data-en="Type">类型</th><th data-zh="必需" data-en="Required">必需</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>task_id</td><td>string</td><td>是</td><td>任务 ID</td></tr>
-            <tr><td>secret</td><td>string</td><td>是</td><td>任务密钥</td></tr>
-            <tr><td>signature</td><td>string</td><td>是</td><td>凭证签名</td></tr>
+            <tr><td>task_id</td><td>string</td><td data-zh="是" data-en="Yes">是</td><td data-zh="任务 ID" data-en="Task ID">任务 ID</td></tr>
+            <tr><td>secret</td><td>string</td><td data-zh="是" data-en="Yes">是</td><td data-zh="任务密钥" data-en="Task secret">任务密钥</td></tr>
+            <tr><td>signature</td><td>string</td><td data-zh="是" data-en="Yes">是</td><td data-zh="凭证签名" data-en="Credential signature">凭证签名</td></tr>
         </tbody>
     </table>
-    <h3>响应</h3>
+    <h3 data-zh="响应" data-en="Response">响应</h3>
     <table>
         <thead>
-            <tr><th>状态码</th><th>含义</th><th>响应体</th></tr>
+            <tr><th data-zh="状态码" data-en="Status">状态码</th><th data-zh="含义" data-en="Meaning">含义</th><th data-zh="响应体" data-en="Body">响应体</th></tr>
         </thead>
         <tbody>
-            <tr><td>200</td><td>删除成功</td><td><code>{"ok": true}</code></td></tr>
-            <tr><td>400</td><td>请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
-            <tr><td>403</td><td>凭证无效</td><td><code>{"error": "forbidden"}</code></td></tr>
-            <tr><td>404</td><td>任务不存在或已过期</td><td><code>{"error": "not found"}</code></td></tr>
-            <tr><td>500</td><td>内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
+            <tr><td>200</td><td data-zh="删除成功" data-en="Deleted">删除成功</td><td><code>{"ok": true}</code></td></tr>
+            <tr><td>400</td><td data-zh="请求体格式错误" data-en="Bad request body">请求体格式错误</td><td><code>{"error": "bad payload"}</code></td></tr>
+            <tr><td>403</td><td data-zh="凭证无效" data-en="Invalid credentials">凭证无效</td><td><code>{"error": "forbidden"}</code></td></tr>
+            <tr><td>404</td><td data-zh="任务不存在或已过期" data-en="Task not found or expired">任务不存在或已过期</td><td><code>{"error": "not found"}</code></td></tr>
+            <tr><td>500</td><td data-zh="内部错误" data-en="Internal error">内部错误</td><td><code>{"error": "internal error"}</code></td></tr>
         </tbody>
     </table>
-    <h3>示例</h3>
+    <h3 data-zh="示例" data-en="Example">示例</h3>
     <div class="code-wrapper">
 <pre><code class="language-bash">curl -X DELETE https://api.mailflow.lat/task \
   -H "Content-Type: application/json" \
@@ -413,9 +439,9 @@ Retry-After: &lt;秒数&gt;
 
     <hr>
 
-    <h2>回调通知</h2>
-    <p>如果在创建任务时提供了 <code>callback</code> URL，验证通过后服务会向该 URL 发送 POST 请求：</p>
-    <h3>回调请求</h3>
+    <h2 data-zh="回调通知" data-en="Callback Notification">回调通知</h2>
+    <p data-zh='如果在创建任务时提供了 <code>callback</code> URL，验证通过后服务会向该 URL 发送 POST 请求：' data-en='If a <code>callback</code> URL was provided at task creation, the service will send a POST request to that URL upon verification:'>如果在创建任务时提供了 <code>callback</code> URL，验证通过后服务会向该 URL 发送 POST 请求：</p>
+    <h3 data-zh="回调请求" data-en="Callback Request">回调请求</h3>
     <div class="code-wrapper">
 <pre><code class="language-http">POST &lt;callback_url&gt;
 Content-Type: application/json</code></pre>
@@ -428,47 +454,47 @@ Content-Type: application/json</code></pre>
   "verified_at": 1783624500
 }</code></pre>
     </div>
-    <h3>回调字段</h3>
+    <h3 data-zh="回调字段" data-en="Callback Fields">回调字段</h3>
     <table>
         <thead>
-            <tr><th>字段</th><th>类型</th><th>说明</th></tr>
+            <tr><th data-zh="字段" data-en="Field">字段</th><th data-zh="类型" data-en="Type">类型</th><th data-zh="说明" data-en="Description">说明</th></tr>
         </thead>
         <tbody>
-            <tr><td>task_id</td><td>string</td><td>任务 ID</td></tr>
+            <tr><td>task_id</td><td>string</td><td data-zh="任务 ID" data-en="Task ID">任务 ID</td></tr>
             <tr><td>status</td><td>string</td><td><code>"verified"</code></td></tr>
-            <tr><td>email</td><td>string</td><td>验证通过的发件人邮箱</td></tr>
-            <tr><td>verified_at</td><td>integer</td><td>验证时间（Unix 时间戳）</td></tr>
+            <tr><td>email</td><td>string</td><td data-zh="验证通过的发件人邮箱" data-en="Verified sender email">验证通过的发件人邮箱</td></tr>
+            <tr><td>verified_at</td><td>integer</td><td data-zh="验证时间（Unix 时间戳）" data-en="Verification time (Unix timestamp)">验证时间（Unix 时间戳）</td></tr>
         </tbody>
     </table>
-    <h3>回调规则</h3>
+    <h3 data-zh="回调规则" data-en="Callback Rules">回调规则</h3>
     <ul>
-        <li><strong>仅 HTTPS</strong> — HTTP 地址会被拒绝</li>
-        <li><strong>请求超时 5 秒</strong> — 服务发送 POST 后，如果 5 秒内未收到响应则放弃本次回调</li>
-        <li><strong>回调失败不影响验证结果</strong> — 验证状态已变为 verified，回调仅是通知</li>
-        <li><strong>不重试</strong> — 回调失败后不会再次发送</li>
-        <li><strong>URL 最大长度 2048 字符</strong></li>
+        <li data-zh="<strong>仅 HTTPS</strong> — HTTP 地址会被拒绝" data-en="<strong>HTTPS only</strong> — HTTP addresses will be rejected"><strong>仅 HTTPS</strong> — HTTP 地址会被拒绝</li>
+        <li data-zh="<strong>请求超时 5 秒</strong> — 服务发送 POST 后，如果 5 秒内未收到响应则放弃本次回调" data-en="<strong>5-second timeout</strong> — if no response within 5 seconds, the callback is abandoned"><strong>请求超时 5 秒</strong> — 服务发送 POST 后，如果 5 秒内未收到响应则放弃本次回调</li>
+        <li data-zh="<strong>回调失败不影响验证结果</strong> — 验证状态已变为 verified，回调仅是通知" data-en="<strong>Callback failure does not affect verification</strong> — the status is already verified; the callback is merely a notification"><strong>回调失败不影响验证结果</strong> — 验证状态已变为 verified，回调仅是通知</li>
+        <li data-zh="<strong>不重试</strong> — 回调失败后不会再次发送" data-en="<strong>No retries</strong> — failed callbacks are not re-sent"><strong>不重试</strong> — 回调失败后不会再次发送</li>
+        <li data-zh="<strong>URL 最大长度 2048 字符</strong>" data-en="<strong>Maximum URL length: 2048 characters</strong>"><strong>URL 最大长度 2048 字符</strong></li>
     </ul>
 
     <hr>
 
-    <h2>错误码汇总</h2>
+    <h2 data-zh="错误码汇总" data-en="Error Codes">错误码汇总</h2>
     <table>
         <thead>
-            <tr><th>HTTP 状态码</th><th>error 值</th><th>触发条件</th></tr>
+            <tr><th data-zh="HTTP 状态码" data-en="HTTP Status">HTTP 状态码</th><th data-zh="error 值" data-en="error Value">error 值</th><th data-zh="触发条件" data-en="Trigger">触发条件</th></tr>
         </thead>
         <tbody>
-            <tr><td>400</td><td><code>bad payload</code></td><td>请求体 JSON 格式错误或缺少必需字段</td></tr>
-            <tr><td>403</td><td><code>forbidden</code></td><td>凭证验证失败（task_id/secret/signature 不匹配）</td></tr>
-            <tr><td>404</td><td><code>not found</code></td><td>任务不存在或已过期</td></tr>
-            <tr><td>429</td><td><code>rate limit exceeded</code></td><td>触发限流（日级或秒级）</td></tr>
-            <tr><td>500</td><td><code>internal error</code></td><td>服务内部错误</td></tr>
-            <tr><td>503</td><td><code>degraded</code></td><td>服务不可用（仅 /health）</td></tr>
+            <tr><td>400</td><td><code>bad payload</code></td><td data-zh="请求体 JSON 格式错误或缺少必需字段" data-en="Malformed JSON or missing required fields">请求体 JSON 格式错误或缺少必需字段</td></tr>
+            <tr><td>403</td><td><code>forbidden</code></td><td data-zh="凭证验证失败（task_id/secret/signature 不匹配）" data-en="Credential validation failed (task_id/secret/signature mismatch)">凭证验证失败（task_id/secret/signature 不匹配）</td></tr>
+            <tr><td>404</td><td><code>not found</code></td><td data-zh="任务不存在或已过期" data-en="Task not found or expired">任务不存在或已过期</td></tr>
+            <tr><td>429</td><td><code>rate limit exceeded</code></td><td data-zh="触发限流（日级或秒级）" data-en="Rate limit triggered (daily or burst)">触发限流（日级或秒级）</td></tr>
+            <tr><td>500</td><td><code>internal error</code></td><td data-zh="服务内部错误" data-en="Internal server error">服务内部错误</td></tr>
+            <tr><td>503</td><td><code>degraded</code></td><td data-zh="服务不可用（仅 /health）" data-en="Service unavailable (only /health)">服务不可用（仅 /health）</td></tr>
         </tbody>
     </table>
 
     <hr>
 
-    <h2>完整流程示例</h2>
+    <h2 data-zh="完整流程示例" data-en="Full Flow Example">完整流程示例</h2>
     <div class="code-wrapper">
 <pre><code class="language-bash"># 1. 创建验证任务
 RESPONSE=$(curl -s -X POST https://api.mailflow.lat/create \
@@ -513,21 +539,21 @@ curl -s -X DELETE https://api.mailflow.lat/task \
 
     <hr>
 
-    <h2>注意事项</h2>
+    <h2 data-zh="注意事项" data-en="Notes">注意事项</h2>
     <ul>
-        <li><strong>token 必须出现在邮件正文中</strong> — 这是验证的唯一依据，主题中包含 token 无效</li>
-        <li><strong>任务默认 24 小时过期</strong> — 过期后查询返回 404</li>
-        <li><strong>同一任务只能验证一次</strong> — 即使收到多封邮件，状态也只会从 pending 变为 verified 一次</li>
-        <li><strong>验证通过后可多次查询</strong> — 在任务过期或被删除前，/result 可反复调用，始终返回 verified 状态</li>
-        <li><strong>凭证三件套（task_id + secret + signature）必须完整保存</strong> — 缺少任何一个都无法查询或删除</li>
-        <li><strong>邮件主题建议使用返回的 subject 字段</strong> — 虽然不强制，但有助于用户识别</li>
-        <li><strong>callback URL 必须使用 HTTPS</strong> — HTTP 地址会被拒绝</li>
-        <li><strong>未设置回调时，建议在用户发送邮件后 3-10 秒开始查询</strong> — 邮件投递链路通常需要数秒，过早查询只会得到 pending</li>
+        <li data-zh="<strong>token 必须出现在邮件正文中</strong> — 这是验证的唯一依据，主题中包含 token 无效" data-en="<strong>The token must appear in the email body</strong> — this is the sole basis for verification; including it in the subject does not count"><strong>token 必须出现在邮件正文中</strong> — 这是验证的唯一依据，主题中包含 token 无效</li>
+        <li data-zh="<strong>任务默认 24 小时过期</strong> — 过期后查询返回 404" data-en="<strong>Tasks expire after 24 hours by default</strong> — queries return 404 after expiry"><strong>任务默认 24 小时过期</strong> — 过期后查询返回 404</li>
+        <li data-zh="<strong>同一任务只能验证一次</strong> — 即使收到多封邮件，状态也只会从 pending 变为 verified 一次" data-en="<strong>Each task can only be verified once</strong> — even if multiple emails are received, the status only transitions from pending to verified once"><strong>同一任务只能验证一次</strong> — 即使收到多封邮件，状态也只会从 pending 变为 verified 一次</li>
+        <li data-zh="<strong>验证通过后可多次查询</strong> — 在任务过期或被删除前，/result 可反复调用，始终返回 verified 状态" data-en="<strong>Verified tasks can be queried multiple times</strong> — before expiry or deletion, /result always returns verified"><strong>验证通过后可多次查询</strong> — 在任务过期或被删除前，/result 可反复调用，始终返回 verified 状态</li>
+        <li data-zh="<strong>凭证三件套（task_id + secret + signature）必须完整保存</strong> — 缺少任何一个都无法查询或删除" data-en="<strong>The credential triplet (task_id + secret + signature) must be saved in full</strong> — missing any one prevents querying or deletion"><strong>凭证三件套（task_id + secret + signature）必须完整保存</strong> — 缺少任何一个都无法查询或删除</li>
+        <li data-zh="<strong>邮件主题建议使用返回的 subject 字段</strong> — 虽然不强制，但有助于用户识别" data-en="<strong>Using the returned subject field is recommended</strong> — not required, but helps user identification"><strong>邮件主题建议使用返回的 subject 字段</strong> — 虽然不强制，但有助于用户识别</li>
+        <li data-zh="<strong>callback URL 必须使用 HTTPS</strong> — HTTP 地址会被拒绝" data-en="<strong>Callback URL must use HTTPS</strong> — HTTP addresses will be rejected"><strong>callback URL 必须使用 HTTPS</strong> — HTTP 地址会被拒绝</li>
+        <li data-zh="<strong>未设置回调时，建议在用户发送邮件后 3-10 秒开始查询</strong> — 邮件投递链路通常需要数秒，过早查询只会得到 pending" data-en="<strong>Without a callback, start polling 3-10 seconds after the user sends the email</strong> — email delivery takes several seconds; polling too early only returns pending"><strong>未设置回调时，建议在用户发送邮件后 3-10 秒开始查询</strong> — 邮件投递链路通常需要数秒，过早查询只会得到 pending</li>
     </ul>
 
     <hr>
 
-    <h2>示例代码</h2>
+    <h2 data-zh="示例代码" data-en="Code Examples">示例代码</h2>
     
     <h3>curl</h3>
     <div class="code-wrapper">
@@ -625,41 +651,80 @@ await fetch(`${BASE}/task`, {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
 
+<!-- 语言切换功能 -->
+<script>
+    (function() {
+        var currentLang = 'zh';
+
+        function toggleLang() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+            document.title = currentLang === 'zh' ? 'Mailflow - 邮箱验证服务 API 文档' : 'Mailflow - Email Verification API Docs';
+
+            // Toggle all elements with data-zh/data-en
+            var els = document.querySelectorAll('[data-zh][data-en]');
+            for (var i = 0; i < els.length; i++) {
+                els[i].innerHTML = els[i].getAttribute('data-' + currentLang);
+            }
+
+            // Update copy button labels
+            updateCopyBtnLabels();
+        }
+
+        function updateCopyBtnLabels() {
+            var btns = document.querySelectorAll('.copy-btn');
+            for (var i = 0; i < btns.length; i++) {
+                var btn = btns[i];
+                if (btn.classList.contains('copied')) {
+                    btn.innerText = currentLang === 'zh' ? '已复制!' : 'Copied!';
+                } else {
+                    btn.innerText = currentLang === 'zh' ? '复制' : 'Copy';
+                }
+            }
+        }
+
+        // Expose for copy button script
+        window.getCurrentLang = function getCurrentLang() { return currentLang; }
+
+        document.getElementById('langToggle').addEventListener('click', toggleLang);
+    })();
+</script>
+
 <!-- 一键复制功能实现 -->
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const codeWrappers = document.querySelectorAll('.code-wrapper');
+    document.addEventListener('DOMContentLoaded', function() {
+        var codeWrappers = document.querySelectorAll('.code-wrapper');
         
-        codeWrappers.forEach(wrapper => {
-            // 创建复制按钮
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.innerText = '复制';
-            
-            // 绑定点击事件
-            copyBtn.addEventListener('click', () => {
-                const codeElement = wrapper.querySelector('code');
-                const textToCopy = codeElement.innerText;
+        for (var i = 0; i < codeWrappers.length; i++) {
+            (function(wrapper) {
+                var copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.innerText = '复制';
                 
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    // 复制成功，改变按钮状态
-                    copyBtn.innerText = '已复制!';
-                    copyBtn.classList.add('copied');
+                copyBtn.addEventListener('click', function() {
+                    var codeElement = wrapper.querySelector('code');
+                    var textToCopy = codeElement.innerText;
                     
-                    // 2秒后恢复原状
-                    setTimeout(() => {
-                        copyBtn.innerText = '复制';
-                        copyBtn.classList.remove('copied');
-                    }, 2000);
-                }).catch(err => {
-                    console.error('复制失败: ', err);
-                    copyBtn.innerText = '失败';
+                    navigator.clipboard.writeText(textToCopy).then(function() {
+                        var lang = window.getCurrentLang ? window.getCurrentLang() : 'zh';
+                        copyBtn.innerText = lang === 'zh' ? '已复制!' : 'Copied!';
+                        copyBtn.classList.add('copied');
+                        
+                        setTimeout(function() {
+                            var lang2 = window.getCurrentLang ? window.getCurrentLang() : 'zh';
+                            copyBtn.innerText = lang2 === 'zh' ? '复制' : 'Copy';
+                            copyBtn.classList.remove('copied');
+                        }, 2000);
+                    }).catch(function(err) {
+                        console.error('Copy failed: ', err);
+                        var lang = window.getCurrentLang ? window.getCurrentLang() : 'zh';
+                        copyBtn.innerText = lang === 'zh' ? '失败' : 'Failed';
+                    });
                 });
-            });
-            
-            // 将按钮添加到代码块容器中
-            wrapper.appendChild(copyBtn);
-        });
+                
+                wrapper.appendChild(copyBtn);
+            })(codeWrappers[i]);
+        }
     });
 </script>
 </body>
