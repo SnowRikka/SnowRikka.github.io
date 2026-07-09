@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mailflow - 邮箱验证服务 API 文档</title>
+    <title>InboundVerify - 邮箱验证服务 API 文档</title>
     <!-- 引入语法高亮样式 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <style>
@@ -199,9 +199,17 @@
         }
 
         /* Language-specific code block visibility */
-        .lang-en { display: none; }
-        body.lang-en .lang-zh { display: none !important; }
-        body.lang-en .lang-en { display: block !important; }
+        .lang-en:not(body) {
+            display: none;
+        }
+
+        body.lang-en .lang-zh {
+            display: none !important;
+        }
+
+        body.lang-en .lang-en {
+            display: block !important;
+        }
     </style>
 </head>
 
@@ -916,7 +924,7 @@ curl -s -X DELETE https://api.mailflow.lat/task \
   -H "Content-Type: application/json" \
   -d "{\"task_id\":\"$TASK_ID\",\"secret\":\"$SECRET\",\"signature\":\"$SIGNATURE\"}"</code></pre>
         </div>
-        <div class="code-wrapper lang-en" style="display:none">
+        <div class="code-wrapper lang-en">
             <pre><code class="language-bash"># 1. Create verification task
 RESPONSE=$(curl -s -X POST https://api.mailflow.lat/create \
   -H "Content-Type: application/json" \
@@ -1017,7 +1025,7 @@ curl -s -X DELETE https://api.mailflow.lat/task \
   -H "Content-Type: application/json" \
   -d '{"task_id":"&lt;task_id&gt;","secret":"&lt;secret&gt;","signature":"&lt;signature&gt;"}'</code></pre>
         </div>
-        <div class="code-wrapper lang-en" style="display:none">
+        <div class="code-wrapper lang-en">
             <pre><code class="language-bash"># Create task
 curl -s -X POST https://api.mailflow.lat/create \
   -H "Content-Type: application/json" \
@@ -1063,7 +1071,7 @@ requests.delete(f"{BASE}/task", json={
     "signature": task["signature"],
 })</code></pre>
         </div>
-        <div class="code-wrapper lang-en" style="display:none">
+        <div class="code-wrapper lang-en">
             <pre><code class="language-python">import requests
 
 BASE = "https://api.mailflow.lat"
@@ -1131,7 +1139,7 @@ await fetch(`${BASE}/task`, {
   }),
 });</code></pre>
         </div>
-        <div class="code-wrapper lang-en" style="display:none">
+        <div class="code-wrapper lang-en">
             <pre><code class="language-javascript">const BASE = "https://api.mailflow.lat";
 
 // Create verification task
@@ -1189,19 +1197,19 @@ await fetch(`${BASE}/task`, {
                 document.body.className = currentLang === 'en' ? 'lang-en' : '';
                 document.title = currentLang === 'zh' ? 'Mailflow - 邮箱验证服务 API 文档' : 'Mailflow - Email Verification API Docs';
 
-                // Toggle all elements with data-zh/data-en
                 var els = document.querySelectorAll('[data-zh][data-en]');
                 for (var i = 0; i < els.length; i++) {
-                    els[i].innerHTML = els[i].getAttribute('data-' + currentLang);
+                    var val = els[i].getAttribute('data-' + currentLang);
+                    els[i].innerHTML = val;
                 }
 
-                // Update copy button labels
                 updateCopyBtnLabels();
 
-                // Re-highlight visible code blocks
                 if (typeof Prism !== 'undefined') {
                     Prism.highlightAll();
                 }
+
+                document.getElementById('btn').innerText = currentLang === 'zh' ? 'EN' : '中文';
             }
 
             function updateCopyBtnLabels() {
