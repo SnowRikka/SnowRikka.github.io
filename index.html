@@ -197,6 +197,11 @@
             background-color: #e1e4e8;
             color: #24292e;
         }
+
+        /* Language-specific code block visibility */
+        .lang-en { display: none; }
+        body.lang-en .lang-zh { display: none !important; }
+        body.lang-en .lang-en { display: block !important; }
     </style>
 </head>
 
@@ -870,7 +875,7 @@ Content-Type: application/json</code></pre>
         <hr>
 
         <h2 data-zh="完整流程示例" data-en="Full Flow Example">完整流程示例</h2>
-        <div class="code-wrapper">
+        <div class="code-wrapper lang-zh">
             <pre><code class="language-bash"># 1. 创建验证任务
 RESPONSE=$(curl -s -X POST https://api.mailflow.lat/create \
   -H "Content-Type: application/json" \
@@ -907,6 +912,47 @@ while true; do
 done
 
 # 3. 删除任务
+curl -s -X DELETE https://api.mailflow.lat/task \
+  -H "Content-Type: application/json" \
+  -d "{\"task_id\":\"$TASK_ID\",\"secret\":\"$SECRET\",\"signature\":\"$SIGNATURE\"}"</code></pre>
+        </div>
+        <div class="code-wrapper lang-en" style="display:none">
+            <pre><code class="language-bash"># 1. Create verification task
+RESPONSE=$(curl -s -X POST https://api.mailflow.lat/create \
+  -H "Content-Type: application/json" \
+  -d '{"callback": ""}')
+
+# Parse response
+TASK_ID=$(echo $RESPONSE | jq -r '.task_id')
+SECRET=$(echo $RESPONSE | jq -r '.secret')
+SIGNATURE=$(echo $RESPONSE | jq -r '.signature')
+MAIL=$(echo $RESPONSE | jq -r '.mail')
+TOKEN=$(echo $RESPONSE | jq -r '.token')
+
+echo "Send email to: $MAIL"
+echo "Body must include: $TOKEN"
+
+# 2. Poll for result (after user sends email)
+while true; do
+  RESULT=$(curl -s -X POST https://api.mailflow.lat/result \
+    -H "Content-Type: application/json" \
+    -d "{\"task_id\":\"$TASK_ID\",\"secret\":\"$SECRET\",\"signature\":\"$SIGNATURE\"}")
+  
+  STATUS=$(echo $RESULT | jq -r '.status')
+  
+  if [ "$STATUS" = "verified" ]; then
+    echo "Verified! Sender: $(echo $RESULT | jq -r '.email')"
+    break
+  elif [ "$STATUS" = "pending" ]; then
+    echo "Waiting..."
+    sleep 5
+  else
+    echo "Error: $RESULT"
+    break
+  fi
+done
+
+# 3. Delete task
 curl -s -X DELETE https://api.mailflow.lat/task \
   -H "Content-Type: application/json" \
   -d "{\"task_id\":\"$TASK_ID\",\"secret\":\"$SECRET\",\"signature\":\"$SIGNATURE\"}"</code></pre>
@@ -955,7 +1001,7 @@ curl -s -X DELETE https://api.mailflow.lat/task \
         <h2 data-zh="示例代码" data-en="Code Examples">示例代码</h2>
 
         <h3>curl</h3>
-        <div class="code-wrapper">
+        <div class="code-wrapper lang-zh">
             <pre><code class="language-bash"># 创建任务
 curl -s -X POST https://api.mailflow.lat/create \
   -H "Content-Type: application/json" \
@@ -971,9 +1017,25 @@ curl -s -X DELETE https://api.mailflow.lat/task \
   -H "Content-Type: application/json" \
   -d '{"task_id":"&lt;task_id&gt;","secret":"&lt;secret&gt;","signature":"&lt;signature&gt;"}'</code></pre>
         </div>
+        <div class="code-wrapper lang-en" style="display:none">
+            <pre><code class="language-bash"># Create task
+curl -s -X POST https://api.mailflow.lat/create \
+  -H "Content-Type: application/json" \
+  -d '{"callback": ""}'
+
+# Query result
+curl -s -X POST https://api.mailflow.lat/result \
+  -H "Content-Type: application/json" \
+  -d '{"task_id":"&lt;task_id&gt;","secret":"&lt;secret&gt;","signature":"&lt;signature&gt;"}'
+
+# Delete task
+curl -s -X DELETE https://api.mailflow.lat/task \
+  -H "Content-Type: application/json" \
+  -d '{"task_id":"&lt;task_id&gt;","secret":"&lt;secret&gt;","signature":"&lt;signature&gt;"}'</code></pre>
+        </div>
 
         <h3>Python</h3>
-        <div class="code-wrapper">
+        <div class="code-wrapper lang-zh">
             <pre><code class="language-python">import requests
 
 BASE = "https://api.mailflow.lat"
@@ -1001,9 +1063,37 @@ requests.delete(f"{BASE}/task", json={
     "signature": task["signature"],
 })</code></pre>
         </div>
+        <div class="code-wrapper lang-en" style="display:none">
+            <pre><code class="language-python">import requests
+
+BASE = "https://api.mailflow.lat"
+
+# Create verification task
+resp = requests.post(f"{BASE}/create", json={"callback": ""})
+task = resp.json()
+print(f"Recipient: {task['mail']}")
+print(f"Body must include: {task['token']}")
+
+# Query verification result
+resp = requests.post(f"{BASE}/result", json={
+    "task_id": task["task_id"],
+    "secret": task["secret"],
+    "signature": task["signature"],
+})
+result = resp.json()
+print(f"Status: {result['status']}")
+# When verified: result["email"] is the sender's address
+
+# Delete task
+requests.delete(f"{BASE}/task", json={
+    "task_id": task["task_id"],
+    "secret": task["secret"],
+    "signature": task["signature"],
+})</code></pre>
+        </div>
 
         <h3>Node.js</h3>
-        <div class="code-wrapper">
+        <div class="code-wrapper lang-zh">
             <pre><code class="language-javascript">const BASE = "https://api.mailflow.lat";
 
 // 创建验证任务
@@ -1041,6 +1131,44 @@ await fetch(`${BASE}/task`, {
   }),
 });</code></pre>
         </div>
+        <div class="code-wrapper lang-en" style="display:none">
+            <pre><code class="language-javascript">const BASE = "https://api.mailflow.lat";
+
+// Create verification task
+const createResp = await fetch(`${BASE}/create`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ callback: "" }),
+});
+const task = await createResp.json();
+console.log(`Recipient: ${task.mail}`);
+console.log(`Body must include: ${task.token}`);
+
+// Query verification result
+const resultResp = await fetch(`${BASE}/result`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    task_id: task.task_id,
+    secret: task.secret,
+    signature: task.signature,
+  }),
+});
+const result = await resultResp.json();
+console.log(`Status: ${result.status}`);
+// When verified: result.email is the sender's address
+
+// Delete task
+await fetch(`${BASE}/task`, {
+  method: "DELETE",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    task_id: task.task_id,
+    secret: task.secret,
+    signature: task.signature,
+  }),
+});</code></pre>
+        </div>
     </div>
 
     <!-- 引入语法高亮脚本 -->
@@ -1058,6 +1186,7 @@ await fetch(`${BASE}/task`, {
             function toggleLang() {
                 currentLang = currentLang === 'zh' ? 'en' : 'zh';
                 document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
+                document.body.className = currentLang === 'en' ? 'lang-en' : '';
                 document.title = currentLang === 'zh' ? 'Mailflow - 邮箱验证服务 API 文档' : 'Mailflow - Email Verification API Docs';
 
                 // Toggle all elements with data-zh/data-en
@@ -1068,6 +1197,11 @@ await fetch(`${BASE}/task`, {
 
                 // Update copy button labels
                 updateCopyBtnLabels();
+
+                // Re-highlight visible code blocks
+                if (typeof Prism !== 'undefined') {
+                    Prism.highlightAll();
+                }
             }
 
             function updateCopyBtnLabels() {
