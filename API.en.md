@@ -160,8 +160,8 @@ Query verification result. Requires the credentials returned at task creation.
 
 | Status | Meaning | Body |
 |--------|---------|------|
-| 200 | Pending | `{"status": "pending"}` |
-| 200 | Verified | `{"status": "verified", "email": "sender@example.com"}` |
+| 200 | Pending | `{"task_id": "...", "status": "pending"}` |
+| 200 | Verified | `{"status": "verified", "task_id": "...", "email": "sender@example.com"}` |
 | 400 | Bad payload | `{"error": "bad payload"}` |
 | 403 | Invalid credentials | `{"error": "forbidden"}` |
 | 404 | Task not found or expired | `{"error": "not found"}` |
@@ -173,12 +173,14 @@ Query verification result. Requires the credentials returned at task creation.
 
 | Field | Type | Description |
 |-------|------|-------------|
+| task_id | string | Task ID |
 | status | string | `"pending"` — waiting for the user to send the verification email |
 
 **Verified:**
 
 | Field | Type | Description |
 |-------|------|-------------|
+| task_id | string | Task ID |
 | status | string | `"verified"` — email ownership confirmed |
 | email | string | Verified sender's email address |
 
@@ -197,13 +199,13 @@ curl -X POST https://api.mailflow.lat/result \
 While pending:
 
 ```json
-{"status": "pending"}
+{"task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06", "status": "pending"}
 ```
 
 After verification:
 
 ```json
-{"status": "verified", "email": "user@example.com"}
+{"task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06", "status": "verified", "email": "user@example.com"}
 ```
 
 ---
@@ -224,7 +226,7 @@ Delete a verification task. Requires the credentials returned at task creation.
 
 | Status | Meaning | Body |
 |--------|---------|------|
-| 200 | Deleted | `{"ok": true}` |
+| 200 | Deleted | `{"task_id": "...", "ok": true}` |
 | 400 | Bad payload | `{"error": "bad payload"}` |
 | 403 | Invalid credentials | `{"error": "forbidden"}` |
 | 404 | Task not found or expired | `{"error": "not found"}` |
@@ -243,7 +245,7 @@ curl -X DELETE https://api.mailflow.lat/task \
 ```
 
 ```json
-{"ok": true}
+{"task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06", "ok": true}
 ```
 
 ---
