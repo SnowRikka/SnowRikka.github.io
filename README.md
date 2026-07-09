@@ -160,8 +160,8 @@ curl -X POST https://api.mailflow.lat/create \
 
 | 状态码 | 含义 | 响应体 |
 |--------|------|--------|
-| 200 | 等待验证 | `{"status": "pending"}` |
-| 200 | 验证通过 | `{"status": "verified", "email": "sender@example.com"}` |
+| 200 | 等待验证 | `{"task_id": "...", "status": "pending"}` |
+| 200 | 验证通过 | `{"status": "verified", "task_id": "...", "email": "sender@example.com"}` |
 | 400 | 请求体格式错误 | `{"error": "bad payload"}` |
 | 403 | 凭证无效 | `{"error": "forbidden"}` |
 | 404 | 任务不存在或已过期 | `{"error": "not found"}` |
@@ -173,12 +173,14 @@ curl -X POST https://api.mailflow.lat/create \
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
+| task_id | string | 任务 ID |
 | status | string | `"pending"` — 等待用户发送验证邮件 |
 
 **verified 状态：**
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
+| task_id | string | 任务 ID |
 | status | string | `"verified"` — 邮箱验证通过 |
 | email | string | 验证通过的发件人邮箱地址 |
 
@@ -197,13 +199,13 @@ curl -X POST https://api.mailflow.lat/result \
 等待验证时：
 
 ```json
-{"status": "pending"}
+{"task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06", "status": "pending"}
 ```
 
 验证通过后：
 
 ```json
-{"status": "verified", "email": "user@example.com"}
+{"task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06", "status": "verified", "email": "user@example.com"}
 ```
 
 ---
@@ -224,7 +226,7 @@ curl -X POST https://api.mailflow.lat/result \
 
 | 状态码 | 含义 | 响应体 |
 |--------|------|--------|
-| 200 | 删除成功 | `{"ok": true}` |
+| 200 | 删除成功 | `{"task_id": "...", "ok": true}` |
 | 400 | 请求体格式错误 | `{"error": "bad payload"}` |
 | 403 | 凭证无效 | `{"error": "forbidden"}` |
 | 404 | 任务不存在或已过期 | `{"error": "not found"}` |
@@ -243,7 +245,7 @@ curl -X DELETE https://api.mailflow.lat/task \
 ```
 
 ```json
-{"ok": true}
+{"task_id": "019f4326-9e8a-79f2-9221-99d5bfe25d06", "ok": true}
 ```
 
 ---
