@@ -136,6 +136,13 @@
             color: #f8f8f2;
         }
 
+        /* Inline code: override Prism theme to keep light background */
+        code:not(pre code) {
+            background-color: rgba(27, 31, 35, 0.05) !important;
+            color: inherit !important;
+            text-shadow: none !important;
+        }
+
         /* 复制按钮样式 */
         .copy-btn {
             position: absolute;
@@ -1195,7 +1202,7 @@ await fetch(`${BASE}/task`, {
                 currentLang = currentLang === 'zh' ? 'en' : 'zh';
                 document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
                 document.body.className = currentLang === 'en' ? 'lang-en' : '';
-                document.title = currentLang === 'zh' ? 'Mailflow - 邮箱验证服务 API 文档' : 'Mailflow - Email Verification API Docs';
+                document.title = currentLang === 'zh' ? 'InboundVerify - 邮箱验证服务 API 文档' : 'InboundVerify - Email Verification API Docs';
 
                 var els = document.querySelectorAll('[data-zh][data-en]');
                 for (var i = 0; i < els.length; i++) {
